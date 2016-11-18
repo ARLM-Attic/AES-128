@@ -235,12 +235,12 @@ namespace AES
 
         public byte[] KeyExpansion()
         {
-            byte[] roundKey = new byte[12 * 16];
+            byte[] roundKey = new byte[_countRound * 16];
             Array.Copy(_key, roundKey, 16);
 
             positionArray index = (rd, c, r) => (16 * rd + c + 4 * r);
            
-            for (var round = 1; round < _countRound + 1; round++)
+            for (var round = 1; round < _countRound; round++)
             {             
                 // Copy W(i-1) in WI 
                 for (var row = 1; row < 4; row++)
@@ -256,7 +256,7 @@ namespace AES
                     roundKey[index(round, 0, row)] ^= roundKey[index(round - 1, 0, row)];
                 }
 
-                roundKey[index(round, 0, 0)] ^= _rcon[round - 1];
+                roundKey[index(round, 0, 0)] ^= _rcon[round];
 
 
                 for (var column = 1; column < 4; column++)
@@ -304,7 +304,7 @@ namespace AES
 
                 arrState = AddRoundKey(arrState, listKey[0]);
                 
-                for(var round = 0; round < 10; round++)
+                for(var round = 1; round < _countRound - 1; round++)
                 {
                     //Array.ForEach(arrState, element => element = SubBytes(element));
                     for (var i = 0; i < arrState.Length; i++)
@@ -312,7 +312,7 @@ namespace AES
 
                     arrState = ShiftRows(arrState);
                     arrState = MixColumns(arrState);
-                    arrState = AddRoundKey(arrState, listKey[round + 1]);
+                    arrState = AddRoundKey(arrState, listKey[round]);
                 }
 
                 //Array.ForEach(arrState, element => element = SubBytes(element));
@@ -320,7 +320,7 @@ namespace AES
                     arrState[i] = SubBytes(arrState[i]);
 
                 arrState = ShiftRows(arrState);
-                arrState = AddRoundKey(arrState, listKey[11]);
+                arrState = AddRoundKey(arrState, listKey[_countRound - 1]);
 
 
                 Array.ForEach(arrState, element => output.Add(element));
@@ -350,16 +350,16 @@ namespace AES
                 var arrState = new byte[16];
                 Array.Copy(input, state, arrState, 0, 16);
 
-                arrState = AddRoundKey(arrState, listKey[11]);
+                arrState = AddRoundKey(arrState, listKey[_countRound - 1]);
 
-                for (var round = 0; round < 10; round++)
+                for (var round = _countRound - 2; round > 0; round--)
                 {
                     arrState = InvShiftRows(arrState);
                     //Array.ForEach(arrState, element => element = InvSubBytes(element));
                     for (var i = 0; i < arrState.Length; i++)
                         arrState[i] = InvSubBytes(arrState[i]);
 
-                    arrState = AddRoundKey(arrState, listKey[10 - round]);
+                    arrState = AddRoundKey(arrState, listKey[round]);
                     arrState = InvMixColumns(arrState);     
                 }
 
