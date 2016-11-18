@@ -9,6 +9,7 @@ namespace AES
     class Aes
     {
         delegate int positionArray(int round, int column, int row);
+        delegate int positionArray4(int column, int row);
 
         private static int _countRound = 11;
 
@@ -33,12 +34,95 @@ namespace AES
             0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
         };
 
-
         private byte[] _key;
+
+        private static byte GMul(byte a, byte b)
+        {
+            /*
+             Example: 
+                (d4 x 02) + (bf x 03) + (5d x 01) + (30 x 01)
+                d4 x 02 is d4 << 1, ^ 1b (because the high bit of d4 is set), giving b3;
+                //======================================================================//
+                how to multiply by 3, 9, 11, 13.....
+                3 x X = (2 + 1) x X = (2 x X) + X 
+                9 x X = (((X x 2) x 2) x 2) + X
+                (where + is addition in GF(2^8) === xor)
+                //======================================================================//
+                bf x 03 is bf << 1, ^1b (because thi high bit of bf is set), and ^bf, giving da 
+             */
+            byte result = 0;
+            byte hi_bit_set;
+
+            for(var counter = 0; counter < 8; counter++)
+            {
+                if ((b & 0x01) != 0)
+                    result ^= a;
+
+                hi_bit_set = (byte)(a & 0x80);
+
+                a <<= 1;
+
+                if (hi_bit_set != 0)
+                    a ^= 0x1b;
+
+                b >>= 1;
+            }
+
+            return result;
+
+        }
 
         public static byte SubBytes(byte input)
         {
             return _sbox[ ((input & 0xF0) >> 4) * 16 + (input & 0x0F) ];
+        }
+
+        public static byte[] ShiftRows(byte[] input)
+        {
+            byte[] changeArray = new byte[4 * 4];
+            for(var row = 0; row < 4; row++)
+            {
+                Array.Copy(input,  4 * row + row, changeArray, 4 * row, 4 - row);
+            }
+            for(var row = 1; row < 4; row++)
+            {
+                Array.Copy(input, 4 * row, changeArray, 4 * row + 4 - row,  row);
+            }
+
+            return changeArray;            
+        }
+
+        public static byte[] MixColumns(byte[] input)
+        {
+            byte[] changeArray = new byte[4 * 4];
+
+            positionArray4 index = (c, r) => (c + 4 * r);
+            
+
+            for(var column = 0; column < 4; column++)
+            {
+                changeArray[index(column, 0)] = (byte) (GMul(input[index(column, 0)], 0x02) ^ GMul(input[index(column, 1)], 0x03) ^ 
+                                                         input[index(column, 2)] ^ input[index(column, 3)]);
+                changeArray[index(column, 1)] = (byte)(GMul(input[index(column, 1)], 0x02) ^ GMul(input[index(column, 2)], 0x03) ^
+                                                         input[index(column, 0)] ^ input[index(column, 3)]);
+                changeArray[index(column, 2)] = (byte)(GMul(input[index(column, 2)], 0x02) ^ GMul(input[index(column, 3)], 0x03) ^
+                                                         input[index(column, 0)] ^ input[index(column, 1)]);
+                changeArray[index(column, 3)] = (byte)(GMul(input[index(column, 0)], 0x03) ^ GMul(input[index(column, 3)], 0x02) ^
+                                         input[index(column, 1)] ^ input[index(column, 2)]);
+
+            }
+
+            return changeArray;
+
+        }
+
+        public static byte[] AddRoundKey(byte[] input, byte[] key)
+        {
+            for(var i = 0; i < input.Length; i++)
+            {
+                input[i] ^= key[i];
+            }
+            return input;
         }
 
         public Aes(byte[] key)
@@ -52,13 +136,9 @@ namespace AES
             Array.Copy(_key, roundKey, 16);
 
             positionArray index = (rd, c, r) => (16 * rd + c + 4 * r);
-
-            
-
+           
             for (var round = 1; round < _countRound + 1; round++)
-            {
-
-                                
+            {             
                 // Copy W(i-1) in WI 
                 for (var row = 1; row < 4; row++)
                 {
@@ -90,6 +170,56 @@ namespace AES
             return roundKey;
         }
 
+        public byte[] Encrypt(byte[] input)
+        {
+            var key = KeyExpansion();
+
+            if(input.Length % 16 != 0)
+            {
+                var temp = new byte[input.Length + (16 - input.Length % 16)];
+                Array.Copy(input, temp, input.Length);
+                input = temp;
+            }
+
+            var output = new List<byte>();
+
+            var listKey = new List<byte[]>();
+
+            for (var i = 0; i < key.Length; i += 16)
+            {
+                var arr = new byte[16];
+                Array.Copy(key, i, arr, 0, 16);
+                listKey.Add(arr);
+            }
+
+
+            for (var state = 0; state < input.Length; state += 16)
+            {
+
+                var arrState = new byte[16];
+                Array.Copy(input, state, arrState, 0, 16);
+
+                arrState = AddRoundKey(arrState, listKey[0]);
+                
+                for(var round = 0; round < 9; round++)
+                {
+                    Array.ForEach(arrState, element => element = SubBytes(element));
+                    arrState = ShiftRows(arrState);
+                    arrState = MixColumns(arrState);
+                    arrState = AddRoundKey(arrState, listKey[round + 1]);
+                }
+
+                Array.ForEach(arrState, element => element = SubBytes(element));
+                arrState = ShiftRows(arrState);
+                arrState = AddRoundKey(arrState, listKey[11]);
+
+
+                Array.ForEach(arrState, element => output.Add(element));
+
+            }
+            
+            return output.ToArray();
+        }
 
     }
 }
