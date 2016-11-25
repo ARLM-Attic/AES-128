@@ -7,16 +7,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace AES
 {
     public partial class Form1 : Form
     {
-        Aes aes;
 
         public Form1()
         {
             InitializeComponent();
+            for (var i = 1; i < 16; i++)
+                cb_sizeBlock.Items.Add(i.ToString());
+            cb_sizeBlock.SelectedIndex = 1;
+            tb_pathInputText.Text = "input.txt";
+            tb_pathOutputText.Text = "output.bin";
         }
 
         private byte[] StringToByte(string str)
@@ -36,6 +41,11 @@ namespace AES
             //var result2 = test.Decrypt(result);
         }
 
+        private void Message(string message)
+        {
+            MessageBox.Show(message, "Error!");
+        }
+
         private void btn_genInitVect_Click(object sender, EventArgs e)
         {
             byte[] generation128 = new byte[16];
@@ -44,103 +54,55 @@ namespace AES
             tb_initVector.Text = BitConverter.ToString(generation128);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btn_encrypt_Click(object sender, EventArgs e)
-        {
-            var aes = new Aes(StringToByte(tb_key.Text));
-            var plainText = StringToByte(tb_binPlainText.Text);
-            var initVector = aes.Encrypt(StringToByte(tb_initVector.Text));
-
-            if (plainText.Length % 16 != 0)
-            {
-                var temp = new byte[plainText.Length + (16 - plainText.Length % 16)];
-                Array.Copy(plainText, temp, plainText.Length);
-                plainText = temp;
-            }
-
-            var output = new List<byte>();
-
-            for(var state = 0; state < plainText.Length; state += 16)
-            {
-                for(var i = 0; i < 16; i++)
-                {
-                    output.Add((byte)(plainText[i + state] ^ initVector[i]));
-                }
-
-                initVector = aes.Encrypt(initVector);
-            }
-
-            tb_binCipherText.Text = BitConverter.ToString(output.ToArray());
-
-        }
-
-        private void btn_decrypt_Click(object sender, EventArgs e)
-        {
-            //var aes = new Aes(StringToByte(tb_key.Text));
-            ////tb_roundKey.Text = BitConverter.ToString(aes.KeyExpansion());
-
-            //var input = StringToByte(tb_binCipherText.Text);
-
-            //if (input.Length % 16 != 0)
-            //{
-            //    var temp = new byte[input.Length + (16 - input.Length % 16)];
-            //    Array.Copy(input, temp, input.Length);
-            //    input = temp;
-            //}
-
-            var aes = new Aes(StringToByte(tb_key.Text));
-            var CipherText = StringToByte(tb_binCipherText.Text);
-            var initVector = aes.Encrypt(StringToByte(tb_initVector.Text));
-
-            if (CipherText.Length % 16 != 0)
-            {
-                var temp = new byte[CipherText.Length + (16 - CipherText.Length % 16)];
-                Array.Copy(CipherText, temp, CipherText.Length);
-                CipherText = temp;
-            }
-
-            var output = new List<byte>();
-
-            for (var state = 0; state < CipherText.Length; state += 16)
-            {
-                for (var i = 0; i < 16; i++)
-                {
-                    output.Add((byte)(CipherText[i + state] ^ initVector[i]));
-                }
-
-                initVector = aes.Encrypt(initVector);
-            }
-
-            tb_plainText.Text = Encoding.ASCII.GetString(output.ToArray());
-        }
-
-        private void tb_plainText_TextChanged(object sender, EventArgs e)
-        {
-            //tb_binPlainText.Text = BitConverter.ToString(Encoding.UTF8.GetBytes(tb_plainText.Text));
-            tb_binPlainText.Text = BitConverter.ToString(Encoding.ASCII.GetBytes(tb_plainText.Text));
-        }
-
-        private void tb_binCipherText_TextChanged(object sender, EventArgs e)
+        private void btn_dInputText_Click(object sender, EventArgs e)
         {
             try
             {
-                tb_ciphertext.Text = Convert.ToBase64String(StringToByte(tb_binCipherText.Text));
+                var file = BitConverter.ToString(File.ReadAllBytes(tb_pathInputText.Text));
+
+                if (check_Сiphertext.Checked)
+                {
+                    tb_initVector.Text = file.Substring(0, 47);
+                    tb_plainText.Text = file.Substring(48, file.Length - 48);
+                }
+                else
+                    tb_plainText.Text = file;
+
+
             }
             catch
             {
-                if(tb_binCipherText.Text.Length == 0)
-                {
-                    tb_ciphertext.Text = "";
-                }
-                return;
+                Message("Error input file!");
             }
-            
         }
 
+        private void btn_save_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if(check_Сiphertext.Checked)
+                    File.WriteAllBytes(tb_pathOutputText.Text, StringToByte(tb_initVector.Text + '-' + tb_ciphertext.Text));
+                else
+                    File.WriteAllBytes(tb_pathOutputText.Text, StringToByte(tb_ciphertext.Text));
+            }
+            catch
+            {
+                Message("Error save file!");
+            }
+        }
 
+        private void btn_Go_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var input = StringToByte(tb_plainText.Text);
+                var ofb = new OFB(StringToByte(tb_key.Text), StringToByte(tb_initVector.Text), int.Parse(cb_sizeBlock.SelectedItem.ToString()));
+                tb_ciphertext.Text = BitConverter.ToString(ofb.Decode(StringToByte(tb_plainText.Text)));
+            }
+            catch
+            {
+                Message("Error decode!");
+            }
+        }
     }
 }
