@@ -36,6 +36,14 @@ namespace AES
             //var result2 = test.Decrypt(result);
         }
 
+        private void btn_genInitVect_Click(object sender, EventArgs e)
+        {
+            byte[] generation128 = new byte[16];
+            Random rnd = new Random();
+            rnd.NextBytes(generation128);
+            tb_initVector.Text = BitConverter.ToString(generation128);
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -44,32 +52,76 @@ namespace AES
         private void btn_encrypt_Click(object sender, EventArgs e)
         {
             var aes = new Aes(StringToByte(tb_key.Text));
-            tb_roundKey.Text = BitConverter.ToString(aes.KeyExpansion());
+            var plainText = StringToByte(tb_binPlainText.Text);
+            var initVector = aes.Encrypt(StringToByte(tb_initVector.Text));
 
-            tb_binCipherText.Text = BitConverter.ToString(aes.Encrypt(StringToByte(tb_binPlainText.Text)));
+            if (plainText.Length % 16 != 0)
+            {
+                var temp = new byte[plainText.Length + (16 - plainText.Length % 16)];
+                Array.Copy(plainText, temp, plainText.Length);
+                plainText = temp;
+            }
+
+            var output = new List<byte>();
+
+            for(var state = 0; state < plainText.Length; state += 16)
+            {
+                for(var i = 0; i < 16; i++)
+                {
+                    output.Add((byte)(plainText[i + state] ^ initVector[i]));
+                }
+
+                initVector = aes.Encrypt(initVector);
+            }
+
+            tb_binCipherText.Text = BitConverter.ToString(output.ToArray());
 
         }
 
         private void btn_decrypt_Click(object sender, EventArgs e)
         {
+            //var aes = new Aes(StringToByte(tb_key.Text));
+            ////tb_roundKey.Text = BitConverter.ToString(aes.KeyExpansion());
+
+            //var input = StringToByte(tb_binCipherText.Text);
+
+            //if (input.Length % 16 != 0)
+            //{
+            //    var temp = new byte[input.Length + (16 - input.Length % 16)];
+            //    Array.Copy(input, temp, input.Length);
+            //    input = temp;
+            //}
+
             var aes = new Aes(StringToByte(tb_key.Text));
-            tb_roundKey.Text = BitConverter.ToString(aes.KeyExpansion());
+            var CipherText = StringToByte(tb_binCipherText.Text);
+            var initVector = aes.Encrypt(StringToByte(tb_initVector.Text));
 
-            var input = StringToByte(tb_binCipherText.Text);
-
-            if (input.Length % 16 != 0)
+            if (CipherText.Length % 16 != 0)
             {
-                var temp = new byte[input.Length + (16 - input.Length % 16)];
-                Array.Copy(input, temp, input.Length);
-                input = temp;
+                var temp = new byte[CipherText.Length + (16 - CipherText.Length % 16)];
+                Array.Copy(CipherText, temp, CipherText.Length);
+                CipherText = temp;
             }
 
-            tb_plainText.Text = Encoding.UTF8.GetString(aes.Decrypt(input));
+            var output = new List<byte>();
+
+            for (var state = 0; state < CipherText.Length; state += 16)
+            {
+                for (var i = 0; i < 16; i++)
+                {
+                    output.Add((byte)(CipherText[i + state] ^ initVector[i]));
+                }
+
+                initVector = aes.Encrypt(initVector);
+            }
+
+            tb_plainText.Text = Encoding.ASCII.GetString(output.ToArray());
         }
 
         private void tb_plainText_TextChanged(object sender, EventArgs e)
         {
-            tb_binPlainText.Text = BitConverter.ToString(Encoding.UTF8.GetBytes(tb_plainText.Text));
+            //tb_binPlainText.Text = BitConverter.ToString(Encoding.UTF8.GetBytes(tb_plainText.Text));
+            tb_binPlainText.Text = BitConverter.ToString(Encoding.ASCII.GetBytes(tb_plainText.Text));
         }
 
         private void tb_binCipherText_TextChanged(object sender, EventArgs e)
@@ -88,5 +140,7 @@ namespace AES
             }
             
         }
+
+
     }
 }

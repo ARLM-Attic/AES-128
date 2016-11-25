@@ -32,7 +32,6 @@
             this.tb_key = new System.Windows.Forms.TextBox();
             this.btn_generate = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.tb_roundKey = new System.Windows.Forms.TextBox();
             this.tb_plainText = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tb_ciphertext = new System.Windows.Forms.TextBox();
@@ -43,6 +42,8 @@
             this.tb_binCipherText = new System.Windows.Forms.TextBox();
             this.btn_encrypt = new System.Windows.Forms.Button();
             this.btn_decrypt = new System.Windows.Forms.Button();
+            this.tb_initVector = new System.Windows.Forms.TextBox();
+            this.btn_genInitVect = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -58,12 +59,12 @@
             // 
             this.tb_key.Location = new System.Drawing.Point(79, 10);
             this.tb_key.Name = "tb_key";
-            this.tb_key.Size = new System.Drawing.Size(373, 20);
+            this.tb_key.Size = new System.Drawing.Size(666, 20);
             this.tb_key.TabIndex = 1;
             // 
             // btn_generate
             // 
-            this.btn_generate.Location = new System.Drawing.Point(458, 8);
+            this.btn_generate.Location = new System.Drawing.Point(753, 8);
             this.btn_generate.Name = "btn_generate";
             this.btn_generate.Size = new System.Drawing.Size(111, 23);
             this.btn_generate.TabIndex = 2;
@@ -76,21 +77,13 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(13, 41);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(62, 13);
+            this.label2.Size = new System.Drawing.Size(58, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "Round key:";
-            // 
-            // tb_roundKey
-            // 
-            this.tb_roundKey.Location = new System.Drawing.Point(79, 38);
-            this.tb_roundKey.Multiline = true;
-            this.tb_roundKey.Name = "tb_roundKey";
-            this.tb_roundKey.Size = new System.Drawing.Size(783, 80);
-            this.tb_roundKey.TabIndex = 4;
+            this.label2.Text = "Init Vector:";
             // 
             // tb_plainText
             // 
-            this.tb_plainText.Location = new System.Drawing.Point(79, 124);
+            this.tb_plainText.Location = new System.Drawing.Point(79, 64);
             this.tb_plainText.Multiline = true;
             this.tb_plainText.Name = "tb_plainText";
             this.tb_plainText.Size = new System.Drawing.Size(373, 144);
@@ -100,7 +93,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 127);
+            this.label3.Location = new System.Drawing.Point(13, 67);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 13);
             this.label3.TabIndex = 5;
@@ -108,7 +101,7 @@
             // 
             // tb_ciphertext
             // 
-            this.tb_ciphertext.Location = new System.Drawing.Point(79, 274);
+            this.tb_ciphertext.Location = new System.Drawing.Point(79, 214);
             this.tb_ciphertext.Multiline = true;
             this.tb_ciphertext.Name = "tb_ciphertext";
             this.tb_ciphertext.Size = new System.Drawing.Size(373, 144);
@@ -117,7 +110,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 277);
+            this.label4.Location = new System.Drawing.Point(13, 217);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(57, 13);
             this.label4.TabIndex = 7;
@@ -125,7 +118,7 @@
             // 
             // tb_binPlainText
             // 
-            this.tb_binPlainText.Location = new System.Drawing.Point(489, 124);
+            this.tb_binPlainText.Location = new System.Drawing.Point(489, 64);
             this.tb_binPlainText.Multiline = true;
             this.tb_binPlainText.Name = "tb_binPlainText";
             this.tb_binPlainText.Size = new System.Drawing.Size(373, 144);
@@ -134,7 +127,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(458, 127);
+            this.label5.Location = new System.Drawing.Point(458, 67);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(25, 13);
             this.label5.TabIndex = 10;
@@ -143,7 +136,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(458, 277);
+            this.label6.Location = new System.Drawing.Point(458, 217);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(25, 13);
             this.label6.TabIndex = 12;
@@ -151,7 +144,7 @@
             // 
             // tb_binCipherText
             // 
-            this.tb_binCipherText.Location = new System.Drawing.Point(489, 274);
+            this.tb_binCipherText.Location = new System.Drawing.Point(489, 214);
             this.tb_binCipherText.Multiline = true;
             this.tb_binCipherText.Name = "tb_binCipherText";
             this.tb_binCipherText.Size = new System.Drawing.Size(373, 144);
@@ -160,7 +153,7 @@
             // 
             // btn_encrypt
             // 
-            this.btn_encrypt.Location = new System.Drawing.Point(79, 429);
+            this.btn_encrypt.Location = new System.Drawing.Point(79, 369);
             this.btn_encrypt.Name = "btn_encrypt";
             this.btn_encrypt.Size = new System.Drawing.Size(373, 40);
             this.btn_encrypt.TabIndex = 13;
@@ -170,7 +163,7 @@
             // 
             // btn_decrypt
             // 
-            this.btn_decrypt.Location = new System.Drawing.Point(489, 429);
+            this.btn_decrypt.Location = new System.Drawing.Point(489, 369);
             this.btn_decrypt.Name = "btn_decrypt";
             this.btn_decrypt.Size = new System.Drawing.Size(373, 40);
             this.btn_decrypt.TabIndex = 14;
@@ -178,11 +171,30 @@
             this.btn_decrypt.UseVisualStyleBackColor = true;
             this.btn_decrypt.Click += new System.EventHandler(this.btn_decrypt_Click);
             // 
+            // tb_initVector
+            // 
+            this.tb_initVector.Location = new System.Drawing.Point(79, 38);
+            this.tb_initVector.Name = "tb_initVector";
+            this.tb_initVector.Size = new System.Drawing.Size(666, 20);
+            this.tb_initVector.TabIndex = 15;
+            // 
+            // btn_genInitVect
+            // 
+            this.btn_genInitVect.Location = new System.Drawing.Point(753, 35);
+            this.btn_genInitVect.Name = "btn_genInitVect";
+            this.btn_genInitVect.Size = new System.Drawing.Size(111, 23);
+            this.btn_genInitVect.TabIndex = 16;
+            this.btn_genInitVect.Text = "Generation";
+            this.btn_genInitVect.UseVisualStyleBackColor = true;
+            this.btn_genInitVect.Click += new System.EventHandler(this.btn_genInitVect_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(885, 497);
+            this.ClientSize = new System.Drawing.Size(876, 425);
+            this.Controls.Add(this.btn_genInitVect);
+            this.Controls.Add(this.tb_initVector);
             this.Controls.Add(this.btn_decrypt);
             this.Controls.Add(this.btn_encrypt);
             this.Controls.Add(this.label6);
@@ -193,7 +205,6 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tb_plainText);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.tb_roundKey);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.btn_generate);
             this.Controls.Add(this.tb_key);
@@ -212,7 +223,6 @@
         private System.Windows.Forms.TextBox tb_key;
         private System.Windows.Forms.Button btn_generate;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox tb_roundKey;
         private System.Windows.Forms.TextBox tb_plainText;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tb_ciphertext;
@@ -223,6 +233,8 @@
         private System.Windows.Forms.TextBox tb_binCipherText;
         private System.Windows.Forms.Button btn_encrypt;
         private System.Windows.Forms.Button btn_decrypt;
+        private System.Windows.Forms.TextBox tb_initVector;
+        private System.Windows.Forms.Button btn_genInitVect;
     }
 }
 
