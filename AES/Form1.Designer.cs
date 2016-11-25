@@ -48,7 +48,7 @@
             this.check_Сiphertext = new System.Windows.Forms.CheckBox();
             this.tb_pathInputText = new System.Windows.Forms.TextBox();
             this.btn_save = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btn_swap = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -227,21 +227,22 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
-            // button2
+            // btn_swap
             // 
-            this.button2.Location = new System.Drawing.Point(79, 301);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(493, 23);
-            this.button2.TabIndex = 27;
-            this.button2.Text = "Swap";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btn_swap.Location = new System.Drawing.Point(79, 301);
+            this.btn_swap.Name = "btn_swap";
+            this.btn_swap.Size = new System.Drawing.Size(493, 23);
+            this.btn_swap.TabIndex = 27;
+            this.btn_swap.Text = "Swap";
+            this.btn_swap.UseVisualStyleBackColor = true;
+            this.btn_swap.Click += new System.EventHandler(this.btn_swap_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(588, 543);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btn_swap);
             this.Controls.Add(this.btn_save);
             this.Controls.Add(this.check_Сiphertext);
             this.Controls.Add(this.tb_pathOutputText);
@@ -291,7 +292,7 @@
         private System.Windows.Forms.CheckBox check_Сiphertext;
         private System.Windows.Forms.TextBox tb_pathInputText;
         private System.Windows.Forms.Button btn_save;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btn_swap;
     }
 }
 

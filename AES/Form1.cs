@@ -104,5 +104,12 @@ namespace AES
                 Message("Error decode!");
             }
         }
+
+        private void btn_swap_Click(object sender, EventArgs e)
+        {
+            var temp = tb_plainText.Text;
+            tb_plainText.Text = tb_ciphertext.Text;
+            tb_ciphertext.Text = temp;
+        }
     }
 }
