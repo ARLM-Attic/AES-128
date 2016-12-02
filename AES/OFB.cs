@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace AES
 {
     class ExceptionOFB : Exception {
-        public ExceptionOFB(string message)
+        public ExceptionOFB(string message) : base(message)
         {
-            new Exception(message);
+
         }
     };
 
