@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace AES
 {
-    class ExceptionOFB : Exception {
+    public class ExceptionOFB : Exception {
         public ExceptionOFB(string message) : base(message)
         {
 
         }
     };
 
-    class OFB
+    public class OFB
     {
         private Aes _aes;
         private byte[] _initVector;
@@ -24,6 +24,13 @@ namespace AES
         {
             if (sizeBlock < 1 || sizeBlock > 127)
                 throw new ExceptionOFB("Size block not correct");
+
+            if (key.Count() != 16)
+                throw new ExceptionOFB("Key not correct");
+
+            if (iv.Count() != 16)
+                throw new ExceptionOFB("Init vector not correct");
+
             _initVector = iv;
             _sizeBlock = sizeBlock;
             _shiftRegistr = new List<byte>();
