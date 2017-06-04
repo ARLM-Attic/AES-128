@@ -14,4 +14,4 @@ Rijndael algorithm
 <p>В экспериментальной части курсового проекта проводились испытания на проверку устойчивости системы к различного рода помехам (изменение/добавление/удаления байт, ).</p>
 <p>Рассмотренны достоинства и недостатки поточных шифров (OFB)</p>
 <p>Скриншот программы:</p>
-![aes128](https://cloud.githubusercontent.com/assets/19309892/20848136/d3bd44de-b8e1-11e6-9dec-a11b883e1ce5.png)
+<img alt="screenshot" src="https://cloud.githubusercontent.com/assets/19309892/20848136/d3bd44de-b8e1-11e6-9dec-a11b883e1ce5.png">
